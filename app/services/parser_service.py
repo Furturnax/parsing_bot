@@ -6,9 +6,14 @@ MAX_DESCRIPTION: int = 97
 
 class ParserService:
     @staticmethod
-    async def parse_channel(channel_url: str):
+    async def parse_channel(channel_url: str, video_count: int):
         async with httpx.AsyncClient() as client:
             chanal_response = await client.get(channel_url)
+
+            if chanal_response.status_code == 301:
+                redirected_url = chanal_response.headers['Location']
+                chanal_response = await client.get(redirected_url)
+
             if chanal_response.status_code != 200:
                 raise Exception(
                     'Ошибка получения данных с канала. '
@@ -21,7 +26,7 @@ class ParserService:
             )
             videos = []
 
-            for video in chanal_videos:
+            for video in chanal_videos[:video_count]:
                 video_url = f'https://rutube.ru{video["href"]}'
                 video_response = await client.get(video_url)
                 video_soup = BeautifulSoup(video_response.text, 'html.parser')
