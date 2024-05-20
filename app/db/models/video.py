@@ -5,6 +5,8 @@ from .base import Base
 
 
 class Video(Base):
+    """Модель видео."""
+    
     __tablename__ = 'videos'
 
     id: Mapped[int] = mapped_column(

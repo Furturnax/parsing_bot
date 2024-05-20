@@ -1,5 +1,7 @@
 import re
-from aiogram import Router, types
+
+from aiogram import Router
+from aiogram.types import Message
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
@@ -12,9 +14,6 @@ from app.text import (
     NUMBER_ERROR
 )
 from app.services.parser_service import ParserService
-from app.services.database_service import SavingService
-from app.repositories.video_repository import VideoRepository
-from app.repositories.user_repository import UserRepository
 
 router = Router()
 
@@ -25,13 +24,15 @@ class Parsing(StatesGroup):
 
 
 @router.message(Command('start'))
-async def cmd_start(message: types.Message, state: FSMContext) -> None:
+async def cmd_start(message: Message, state: FSMContext) -> None:
+    """Обработчик стартовой команды."""
     await state.set_state(Parsing.waiting_for_channel_url)
     await message.answer(HELLO.format(name=message.from_user.full_name))
 
 
 @router.message(Parsing.waiting_for_channel_url)
-async def process_channel_url(message: types.Message, state: FSMContext) -> None:
+async def process_channel_url(message: Message, state: FSMContext) -> None:
+    """Обработчик состояния ввода ссылки."""
     channel_url = message.text
     channel_link_pattern = r'https:\/\/rutube\.ru\/channel\/\d+\/?$'
 
@@ -44,7 +45,8 @@ async def process_channel_url(message: types.Message, state: FSMContext) -> None
 
 
 @router.message(Parsing.waiting_for_video_count)
-async def process_video_count(message: types.Message, state: FSMContext) -> None:
+async def process_video_count(message: Message, state: FSMContext) -> None:
+    """Обработчик состояния ввода числа количества ссылок на видео."""
     data = await state.get_data()
 
     try:
@@ -57,12 +59,6 @@ async def process_video_count(message: types.Message, state: FSMContext) -> None
 
     channel_url = data['channel_url']
     videos = await ParserService.parse_channel(channel_url, video_count)
-    user_id = message.from_user.id
-
-    video_repo = VideoRepository()
-    user_repo = UserRepository()
-    saving_service = SavingService(video_repo, user_repo)
-    await saving_service.save_videos(user_id, channel_url, videos)
 
     for video in videos:
         await message.answer(
@@ -75,5 +71,6 @@ async def process_video_count(message: types.Message, state: FSMContext) -> None
 
 
 @router.message()
-async def handle_message(message: types.Message) -> None:
+async def handle_message(message: Message) -> None:
+    """Обработчик любого неопределенного сообщения."""
     await message.answer(EMPTY_MESSAGE)

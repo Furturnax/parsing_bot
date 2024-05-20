@@ -7,6 +7,8 @@ from .base import Base
 
 
 class User(Base):
+    """Модель юзера."""
+
     __tablename__ = 'users'
 
     id: Mapped[int] = mapped_column(
