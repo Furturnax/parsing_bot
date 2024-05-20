@@ -6,7 +6,7 @@ from .base import Base
 
 class Video(Base):
     """Модель видео."""
-    
+
     __tablename__ = 'videos'
 
     id: Mapped[int] = mapped_column(
@@ -20,7 +20,7 @@ class Video(Base):
         index=True
     )
     description: Mapped[str] = mapped_column(String)
-    views: Mapped[int] = mapped_column(Integer)
+    views: Mapped[String] = mapped_column(String)
     video_url: Mapped[str] = mapped_column(String)
     channel_name: Mapped[str] = mapped_column(String)
     user_id: Mapped[int] = mapped_column(
