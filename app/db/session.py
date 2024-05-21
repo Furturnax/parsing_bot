@@ -4,11 +4,11 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker
 )
 
-from app.config import DATABASE_URL
+from app.config import DATABASE_URL_SESSION
 
 
 engine = create_async_engine(
-    DATABASE_URL,
+    DATABASE_URL_SESSION,
     future=True,
     echo=True
 )
