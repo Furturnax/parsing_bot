@@ -37,3 +37,7 @@ pip install -r requirements.txt
 ```shell script
 docker compose -f docker-compose.yml up --build -d 
 ```
++ Выполняем миграции в базу данных:
+```shell script
+alembic upgrade head
+```
